@@ -82,7 +82,7 @@ namespace Remotely.Server.API
 
             await _agentHubContext.Clients.Client(connection.Key).SendAsync("ExecuteCommandFromApi", shell, authToken, requestID, command, User?.Identity?.Name);
 
-            var success = await TaskHelper.DelayUntilAsync(() => AgentHub.ApiScriptResults.TryGetValue(requestID, out _), TimeSpan.FromSeconds(30));
+            await TaskHelper.DelayUntilAsync(() => AgentHub.ApiScriptResults.TryGetValue(requestID, out var success), TimeSpan.FromSeconds(120));
             if (!success)
             {
                 return NotFound();
