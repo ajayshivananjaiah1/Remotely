@@ -80,17 +80,8 @@ namespace Remotely.Server.API
             var requestID = Guid.NewGuid().ToString();
             var authToken = _expiringTokenService.GetToken(Time.Now.AddMinutes(AppConstants.ScriptRunExpirationMinutes));
 
-            await _agentHubContext.Clients.Client(connection.Key).SendAsync("ExecuteCommandFromApi", shell, authToken, requestID, command, User?.Identity?.Name);
-
-            await TaskHelper.DelayUntilAsync(() => AgentHub.ApiScriptResults.TryGetValue(requestID, out var success), TimeSpan.FromSeconds(120));
-            if (!success)
-            {
-                return NotFound();
-            }
-            AgentHub.ApiScriptResults.TryGetValue(requestID, out var commandID);
-            AgentHub.ApiScriptResults.Remove(requestID);
-            var result = _dataService.GetScriptResult(commandID.ToString(), orgID);
-            return result;
+            await _agentHubContext.Clients.Client(connection.Key).SendAsync("ExecuteCommandFromApi", shell, authToken, requestID, command, User?.Identity?.Name)
+            return requestID;
         }
     }
 }
